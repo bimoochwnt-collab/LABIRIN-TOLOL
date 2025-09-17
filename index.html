@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Game Labirin - BY BIMO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            touch-action: manipulation;
+            overflow-x: hidden;
+        }
+        
+        .brand {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .brand h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+        
+        .brand .by {
+            color: #fdbb2d;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            letter-spacing: 3px;
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            transform: rotate(15deg);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 10px;
+            border-radius: 5px;
+        }
+        
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            color: #1a2a6c;
+        }
+        
+        .info-item {
+            text-align: center;
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.8rem;
+            color: #1a2a6c;
+            font-weight: 800;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 25px;
+            position: relative;
+            aspect-ratio: 1/1;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        #maze-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .direction-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            margin: 0 auto;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .control-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to right, #b21f1f, #1a2a6c);
+        }
+        
+        .up-btn {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        
+        .left-btn {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        .right-btn {
+            grid-column: 3;
+            grid-row: 2;
+        }
+        
+        .down-btn {
+            grid-column: 2;
+            grid-row: 3;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .action-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .level-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .level-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .level-btn.active {
+            background: #fdbb2d;
+            color: #1a2a6c;
+        }
+        
+        .win-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        
+        .win-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .win-content {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 2px solid #fdbb2d;
+        }
+        
+        .win-content h2 {
+            margin-bottom: 15px;
+            color: #fdbb2d;
+            font-size: 2rem;
+        }
+        
+        .win-content p {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 500px) {
+            .brand h1 {
+                font-size: 2rem;
+            }
+            
+            .brand .by {
+                font-size: 1rem;
+                position: relative;
+                display: block;
+                transform: none;
+                margin-top: -5px;
+                margin-bottom: 10px;
+            }
+            
+            .info-panel {
+                padding: 12px 15px;
+            }
+            
+            .info-value {
+                font-size: 1.5rem;
+            }
+            
+            .action-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .direction-controls {
+                width: 180px;
+                height: 180px;
+            }
+        }
+        
+        .footer {
+            color: white;
+            text-align: center;
+            margin-top: auto;
+            padding: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Animasi kemenangan */
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebrate {
+            animation: celebrate 0.5s ease-in-out;
+        }
+        
+        /* Efek confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fdbb2d;
+            opacity: 0.7;
+        }
+        
+        /* Touch area untuk swipe */
+        .touch-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="brand">
+        <h1>MAZE GAME</h1>
+        <div class="by">BY BIMO</div>
+    </div>
+    
+    <div class="info-panel">
+        <div class="info-item">
+            <div class="info-label">LEVEL</div>
+            <div id="level" class="info-value">1</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">WAKTU</div>
+            <div id="timer" class="info-value">0s</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">GERAKAN</div>
+            <div id="moves" class="info-value">0</div>
+        </div>
+    </div>
+    
+    <div class="level-select">
+        <button class="level-btn active" data-level="1">LEVEL 1</button>
+        <button class="level-btn" data-level="2">LEVEL 2</button>
+        <button class="level-btn" data-level="3">LEVEL 3</button>
+        <button class="level-btn" data-level="4">LEVEL 4</button>
+        <button class="level-btn" data-level="5">LEVEL 5</button>
+    </div>
+    
+    <div class="game-container">
+        <canvas id="maze-canvas"></canvas>
+        <div class="touch-area" id="touch-area"></div>
+    </div>
+    
+    <div class="controls">
+        <div class="direction-controls">
+            <button class="control-btn up-btn" id="up-btn"><i class="fas fa-arrow-up"></i></button>
+            <button class="control-btn left-btn" id="left-btn"><i class="fas fa-arrow-left"></i></button>
+            <button class="control-btn right-btn" id="right-btn"><i class="fas fa-arrow-right"></i></button>
+            <button class="control-btn down-btn" id="down-btn"><i class="fas fa-arrow-down"></i></button>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="action-btn" id="restart-btn"><i class="fas fa-redo"></i> RESTART</button>
+            <button class="action-btn" id="hint-btn"><i class="fas fa-lightbulb"></i> BANTUAN</button>
+        </div>
+    </div>
+    
+    <div class="win-message" id="win-message">
+        <div class="win-content">
+            <h2>SELAMAT!</h2>
+            <p>Kamu menyelesaikan labirin!</p>
+            <p>Waktu: <span id="final-time"></span></p>
+            <p>Gerakan: <span id="final-moves"></span></p>
+            <button class="action-btn" id="next-level-btn"><i class="fas fa-forward"></i> LEVEL BERIKUTNYA</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        &copy; 2023 Game By BIMO - All rights reserved
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('maze-canvas');
+            const ctx = canvas.getContext('2d');
+            const levelDisplay = document.getElementById('level');
+            const timerDisplay = document.getElementById('timer');
+            const movesDisplay = document.getElementById('moves');
+            const restartBtn = document.getElementById('restart-btn');
+            const hintBtn = document.getElementById('hint-btn');
+            const winMessage = document.getElementById('win-message');
+            const finalTime = document.getElementById('final-time');
+            const finalMoves = document.getElementById('final-moves');
+            const nextLevelBtn = document.getElementById('next-level-btn');
+            const levelButtons = document.querySelectorAll('.level-btn');
+            const touchArea = document.getElementById('touch-area');
+            
+            // Tombol arah
+            const upBtn = document.getElementById('up-btn');
+            const leftBtn = document.getElementById('left-btn');
+            const rightBtn = document.getElementById('right-btn');
+            const downBtn = document.getElementById('down-btn');
+            
+            let cellSize = 30;
+            let player = { x: 1, y: 1 };
+            let moves = 0;
+            let gameTimer = 0;
+            let timerInterval = null;
+            let currentLevel = 1;
+            let maze = [];
+            let exit = { x: 0, y: 0 };
+            
+            // Ukuran canvas
+            function resizeCanvas() {
+                const container = document.querySelector('.game-container');
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                
+                // Sesuaikan ukuran cell berdasarkan ukuran canvas
+                cellSize = Math.min(canvas.width, canvas.height) / 15;
+                
+                drawMaze();
+            }
+            
+            // Inisialisasi game
+            function initGame() {
+                // Hentikan timer sebelumnya jika ada
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                
+                // Reset variabel game
+                moves = 0;
+                gameTimer = 0;
+                movesDisplay.textContent = moves;
+                timerDisplay.textContent = '0s';
+                levelDisplay.textContent = currentLevel;
+                
+                // Generate maze
+                generateMaze();
+                
+                // Mulai timer
+                timerInterval = setInterval(() => {
+                    gameTimer++;
+                    timerDisplay.textContent = `${gameTimer}s`;
+                }, 1000);
+                
+                // Gambar maze
+                drawMaze();
+            }
+            
+            // Generate maze sederhana
+            function generateMaze() {
+                const size = 10 + currentLevel; // Ukuran maze meningkat sesuai level
+                maze = [];
+                
+                // Inisialisasi maze dengan dinding
+                for (let y = 0; y < size; y++) {
+                    maze[y] = [];
+                    for (let x = 0; x < size; x++) {
+                        maze[y][x] = 1; // 1 = dinding, 0 = jalan
+                    }
+                }
+                
+                // Buat jalan menggunakan algoritma sederhana
+                for (let y = 1; y < size - 1; y += 2) {
+                    for (let x = 1; x < size - 1; x += 2) {
+                        maze[y][x] = 0; // Buat jalan di titik-titik tertentu
+                        
+                        // Buat jalan horizontal atau vertikal secara acak
+                        if (x + 2 < size - 1 && Math.random() > 0.5) {
+                            maze[y][x + 1] = 0;
+                        } else if (y + 2 < size - 1) {
+                            maze[y + 1][x] = 0;
+                        }
+                    }
+                }
+                
+                // Tentukan posisi awal pemain
+                player.x = 1;
+                player.y = 1;
+                maze[player.y][player.x] = 0;
+                
+                // Tentukan posisi exit
+                exit.x = size - 2;
+                exit.y = size - 2;
+                maze[exit.y][exit.x] = 2; // 2 = exit
+            }
+            
+            // Gambar maze
+            function drawMaze() {
+                if (!maze.length) return;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const offsetX = (canvas.width - maze[0].length * cellSize) / 2;
+                const offsetY = (canvas.height - maze.length * cellSize) / 2;
+                
+                // Gambar maze
+                for (let y = 0; y < maze.length; y++) {
+                    for (let x = 0; x < maze[y].length; x++) {
+                        if (maze[y][x] === 1) {
+                            // Gambar dinding
+                            ctx.fillStyle = '#1a2a6c';
+                            ctx.fillRect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
+                            
+                            // Efek 3D untuk dinding
+                            ctx.fillStyle = '#2a3a9c';
+                            ctx.fillRect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize * 0.1);
+                            ctx.fillRect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize * 0.1, cellSize);
+                        } else if (maze[y][x] === 2) {
+                            // Gambar exit
+                            ctx.fillStyle = '#4CAF50';
+                            ctx.fillRect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
+                            
+                            // Tanda exit
+                            ctx.fillStyle = 'white';
+                            ctx.font = `${cellSize * 0.6}px Arial`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText('⛩', offsetX + x * cellSize + cellSize / 2, offsetY + y * cellSize + cellSize / 2);
+                        }
+                    }
+                }
+                
+                // Gambar pemain
+                ctx.fillStyle = '#fdbb2d';
+                ctx.beginPath();
+                ctx.arc(
+                    offsetX + player.x * cellSize + cellSize / 2,
+                    offsetY + player.y * cellSize + cellSize / 2,
+                    cellSize * 0.4,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                
+                // Efek highlight untuk pemain
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(
+                    offsetX + player.x * cellSize + cellSize / 2 - cellSize * 0.15,
+                    offsetY + player.y * cellSize + cellSize / 2 - cellSize * 0.15,
+                    cellSize * 0.1,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+            
+            // Gerakkan pemain
+            function movePlayer(dx, dy) {
+                const newX = player.x + dx;
+                const newY = player.y + dy;
+                
+                // Periksa apakah gerakan valid (tidak menabrak dinding)
+                if (newX >= 0 && newX < maze[0].length && newY >= 0 && newY < maze.length && maze[newY][newX] !== 1) {
+                    player.x = newX;
+                    player.y = newY;
+                    moves++;
+                    movesDisplay.textContent = moves;
+                    
+                    drawMaze();
+                    
+                    // Periksa apakah pemain mencapai exit
+                    if (maze[player.y][player.x] === 2) {
+                        clearInterval(timerInterval);
+                        showWinMessage();
+                    }
+                }
+            }
+            
+            // Tampilkan pesan kemenangan
+            function showWinMessage() {
+                finalTime.textContent = `${gameTimer} detik`;
+                finalMoves.textContent = moves;
+                winMessage.classList.add('show');
+            }
+            
+            // Event listeners untuk tombol arah
+            upBtn.addEventListener('click', () => movePlayer(0, -1));
+            leftBtn.addEventListener('click', () => movePlayer(-1, 0));
+            rightBtn.addEventListener('click', () => movePlayer(1, 0));
+            downBtn.addEventListener('click', () => movePlayer(0, 1));
+            
+            // Event listeners untuk tombol aksi
+            restartBtn.addEventListener('click', initGame);
+            nextLevelBtn.addEventListener('click', () => {
+                winMessage.classList.remove('show');
+                currentLevel++;
+                initGame();
+            });
+            
+            // Event listeners untuk tombol level
+            levelButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    levelButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentLevel = parseInt(button.dataset.level);
+                    initGame();
+                });
+            });
+            
+            // Implementasi kontrol swipe
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            touchArea.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                e.preventDefault();
+            });
+            
+            touchArea.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            });
+            
+            touchArea.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                
+                const dx = touchEndX - touchStartX;
+                const dy = touchEndY - touchStartY;
+                
+                // Minimum swipe distance
+                const minSwipeDistance = 30;
+                
+                if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > minSwipeDistance) {
+                    // Horizontal swipe
+                    if (dx > 0) {
+                        movePlayer(1, 0); // Swipe kanan
+                    } else {
+                        movePlayer(-1, 0); // Swipe kiri
+                    }
+                } else if (Math.abs(dy) > minSwipeDistance) {
+                    // Vertical swipe
+                    if (dy > 0) {
+                        movePlayer(0, 1); // Swipe bawah
+                    } else {
+                        movePlayer(0, -1); // Swipe atas
+                    }
+                }
+                
+                e.preventDefault();
+            });
+            
+            // Fitur bantuan (hint)
+            hintBtn.addEventListener('click', () => {
+                // Tampilkan jalan ke exit dengan garis putus-putus (sementara)
+                ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                
+                const offsetX = (canvas.width - maze[0].length * cellSize) / 2;
+                const offsetY = (canvas.height - maze.length * cellSize) / 2;
+                
+                // Gambar garis dari pemain ke exit (contoh sederhana)
+                ctx.moveTo(
+                    offsetX + player.x * cellSize + cellSize / 2,
+                    offsetY + player.y * cellSize + cellSize / 2
+                );
+                
+                ctx.lineTo(
+                    offsetX + exit.x * cellSize + cellSize / 2,
+                    offsetY + exit.y * cellSize + cellSize / 2
+                );
+                
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Hapus hint setelah 2 detik
+                setTimeout(drawMaze, 2000);
+            });
+            
+            // Inisialisasi game saat pertama kali dimuat
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            initGame();
+        });
+    </script>
+</body>
+</html>
